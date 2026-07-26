@@ -1,0 +1,958 @@
+<Window x:Class="AIHotDesktop.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="AI HOT Desktop"
+        Width="420"
+        MinWidth="420"
+        MaxWidth="420"
+        SizeToContent="Height"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        Topmost="False"
+        WindowStartupLocation="Manual"
+        TextOptions.TextFormattingMode="Display"
+        TextOptions.TextRenderingMode="ClearType"
+        Loaded="Window_Loaded"
+        PreviewMouseLeftButtonDown="Window_PreviewMouseLeftButtonDown"
+        Closing="Window_Closing">
+    <Window.Resources>
+        <SolidColorBrush x:Key="CardBackgroundBrush"
+                         Color="#F0241D1A" />
+        <SolidColorBrush x:Key="CardHoverBackgroundBrush"
+                         Color="#FA2C2420" />
+        <SolidColorBrush x:Key="CardPressedBackgroundBrush"
+                         Color="#FF362B26" />
+        <SolidColorBrush x:Key="CardBorderBrush"
+                         Color="#47C8AE96" />
+
+        <Style x:Key="ChromeButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="32" />
+            <Setter Property="Height" Value="32" />
+            <Setter Property="Margin" Value="4,0,0,0" />
+            <Setter Property="Foreground" Value="#D6E0E9" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="FontFamily" Value="{StaticResource AppFont}" />
+            <Setter Property="FontSize" Value="17" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="ChromeButtonBorder"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="9">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ChromeButtonBorder"
+                                        Property="Background"
+                                        Value="#26FFFFFF" />
+                                <Setter Property="Foreground" Value="#FFFFFF" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="ChromeButtonBorder"
+                                        Property="Background"
+                                        Value="#3AFFFFFF" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.42" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="NewsRowButtonStyle" TargetType="Button">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="VerticalContentAlignment" Value="Stretch" />
+            <Setter Property="Margin" Value="0,0,0,8" />
+            <Setter Property="Background"
+                    Value="{DynamicResource CardBackgroundBrush}" />
+            <Setter Property="BorderBrush"
+                    Value="{DynamicResource CardBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="NewsRowBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="14">
+                            <ContentPresenter HorizontalAlignment="Stretch"
+                                              VerticalAlignment="Stretch" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="NewsRowBorder"
+                                        Property="Background"
+                                        Value="{DynamicResource CardHoverBackgroundBrush}" />
+                                <Setter TargetName="NewsRowBorder"
+                                        Property="BorderBrush"
+                                        Value="{DynamicResource CardBorderBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="NewsRowBorder"
+                                        Property="Background"
+                                        Value="{DynamicResource CardPressedBackgroundBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SlimScrollBarStyle" TargetType="ScrollBar">
+            <Setter Property="Width" Value="6" />
+            <Setter Property="Margin" Value="0,5,1,13" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollBar">
+                        <Grid Background="Transparent">
+                            <Track x:Name="PART_Track"
+                                   Minimum="{TemplateBinding Minimum}"
+                                   Maximum="{TemplateBinding Maximum}"
+                                   Value="{TemplateBinding Value}"
+                                   ViewportSize="{TemplateBinding ViewportSize}"
+                                   Orientation="{TemplateBinding Orientation}"
+                                   IsDirectionReversed="True">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Command="ScrollBar.PageUpCommand"
+                                                  CommandTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}"
+                                                  Background="Transparent"
+                                                  BorderThickness="0"
+                                                  Focusable="False"
+                                                  Opacity="0" />
+                                </Track.DecreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb MinHeight="36"
+                                           Background="#68DCE6EC">
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="Thumb">
+                                                <Border Background="{TemplateBinding Background}"
+                                                        CornerRadius="3" />
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                </Track.Thumb>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Command="ScrollBar.PageDownCommand"
+                                                  CommandTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}"
+                                                  Background="Transparent"
+                                                  BorderThickness="0"
+                                                  Focusable="False"
+                                                  Opacity="0" />
+                                </Track.IncreaseRepeatButton>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SettingsSliderStyle" TargetType="Slider">
+            <Setter Property="Height" Value="22" />
+            <Setter Property="Minimum" Value="0" />
+            <Setter Property="Maximum" Value="100" />
+            <Setter Property="SmallChange" Value="1" />
+            <Setter Property="LargeChange" Value="5" />
+            <Setter Property="IsSnapToTickEnabled" Value="True" />
+            <Setter Property="TickFrequency" Value="1" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Slider">
+                        <Grid>
+                            <Track x:Name="PART_Track"
+                                   Minimum="{TemplateBinding Minimum}"
+                                   Maximum="{TemplateBinding Maximum}"
+                                   Value="{TemplateBinding Value}"
+                                   IsDirectionReversed="False">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Command="Slider.DecreaseLarge"
+                                                  Height="4"
+                                                  Background="#C7A15A"
+                                                  BorderThickness="0">
+                                        <RepeatButton.Template>
+                                            <ControlTemplate TargetType="RepeatButton">
+                                                <Border Background="{TemplateBinding Background}"
+                                                        CornerRadius="2" />
+                                            </ControlTemplate>
+                                        </RepeatButton.Template>
+                                    </RepeatButton>
+                                </Track.DecreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb Width="14"
+                                           Height="14"
+                                           Background="#F4F8FB">
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="Thumb">
+                                                <Ellipse Fill="{TemplateBinding Background}"
+                                                         Stroke="#76C7A15A"
+                                                         StrokeThickness="2" />
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                </Track.Thumb>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Command="Slider.IncreaseLarge"
+                                                  Height="4"
+                                                  Background="#3946535F"
+                                                  BorderThickness="0">
+                                        <RepeatButton.Template>
+                                            <ControlTemplate TargetType="RepeatButton">
+                                                <Border Background="{TemplateBinding Background}"
+                                                        CornerRadius="2" />
+                                            </ControlTemplate>
+                                        </RepeatButton.Template>
+                                    </RepeatButton>
+                                </Track.IncreaseRepeatButton>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ToneButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="45" />
+            <Setter Property="Height" Value="30" />
+            <Setter Property="Margin" Value="0,0,7,0" />
+            <Setter Property="BorderBrush" Value="#4DFFFFFF" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Foreground" Value="#E5EBEF" />
+            <Setter Property="FontFamily" Value="{StaticResource AppFont}" />
+            <Setter Property="FontSize" Value="10" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="QuietMetadataTextStyle" TargetType="TextBlock">
+            <Setter Property="Opacity" Value="0.1" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsWidgetEngaged, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                             Value="True">
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                 To="1"
+                                                 Duration="0:0:0.12" />
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.EnterActions>
+                    <DataTrigger.ExitActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                 To="0.1"
+                                                 Duration="0:0:0.16" />
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.ExitActions>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="QuietHeaderMetadataTextStyle" TargetType="TextBlock">
+            <Setter Property="Opacity" Value="0.58" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsWidgetEngaged, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                             Value="True">
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                 To="1"
+                                                 Duration="0:0:0.12" />
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.EnterActions>
+                    <DataTrigger.ExitActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                 To="0.58"
+                                                 Duration="0:0:0.16" />
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.ExitActions>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="QuietChromeButtonStyle"
+               TargetType="Button"
+               BasedOn="{StaticResource ChromeButtonStyle}">
+            <Setter Property="Opacity" Value="0.16" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsWidgetEngaged, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                             Value="True">
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                 To="1"
+                                                 Duration="0:0:0.12" />
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.EnterActions>
+                    <DataTrigger.ExitActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                 To="0.16"
+                                                 Duration="0:0:0.16" />
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.ExitActions>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <DataTemplate x:Key="NewsCardTemplate">
+            <Button Style="{StaticResource NewsRowButtonStyle}"
+                    Click="NewsItem_Click"
+                    ToolTip="{Binding Title}">
+                <Grid Margin="15,14,14,13">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="42" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="{Binding LeadText}"
+                               Margin="0,1,11,0"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Top"
+                               FontFamily="{StaticResource AppFont}"
+                               FontSize="12.5"
+                               FontWeight="SemiBold"
+                               Foreground="{Binding AccentColor}" />
+
+                    <StackPanel Grid.Column="1">
+                        <TextBlock Text="{Binding Title}"
+                                   MaxHeight="44"
+                                   FontFamily="{StaticResource AppFont}"
+                                   FontSize="15.5"
+                                   FontWeight="SemiBold"
+                                   Foreground="#F8FBFD"
+                                   LineHeight="21"
+                                   LineStackingStrategy="BlockLineHeight"
+                                   TextTrimming="CharacterEllipsis"
+                                   TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding Summary}"
+                                   Margin="0,5,0,0"
+                                   Style="{StaticResource QuietMetadataTextStyle}"
+                                   FontFamily="{StaticResource AppFont}"
+                                   FontSize="11.5"
+                                   Foreground="#B7C3CF"
+                                   TextTrimming="CharacterEllipsis"
+                                   TextWrapping="NoWrap" />
+                        <Grid Margin="0,8,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{Binding CategoryLabel}"
+                                       FontFamily="{StaticResource AppFont}"
+                                       FontSize="10.5"
+                                       FontWeight="SemiBold"
+                                       Foreground="{Binding AccentColor}" />
+                            <TextBlock Grid.Column="1"
+                                       Margin="7,0"
+                                       Text="·"
+                                       Style="{StaticResource QuietMetadataTextStyle}"
+                                       FontSize="10.5"
+                                       Foreground="#657584" />
+                            <TextBlock Grid.Column="2"
+                                       Text="{Binding Source}"
+                                       Style="{StaticResource QuietMetadataTextStyle}"
+                                       FontFamily="{StaticResource AppFont}"
+                                       FontSize="10.5"
+                                       Foreground="#8291A1"
+                                       TextTrimming="CharacterEllipsis" />
+                            <TextBlock Grid.Column="3"
+                                       Margin="10,0,0,0"
+                                       Text="{Binding TimeLabel}"
+                                       Style="{StaticResource QuietMetadataTextStyle}"
+                                       FontFamily="{StaticResource AppFont}"
+                                       FontSize="10.5"
+                                       Foreground="#8B9AAA" />
+                        </Grid>
+                    </StackPanel>
+
+                    <TextBlock Grid.Column="2"
+                               Margin="10,0,0,0"
+                               Text="↗"
+                               Style="{StaticResource QuietMetadataTextStyle}"
+                               HorizontalAlignment="Right"
+                               VerticalAlignment="Top"
+                               FontFamily="{StaticResource AppFont}"
+                               FontSize="12"
+                               Foreground="#6D7E8D" />
+                </Grid>
+            </Button>
+        </DataTemplate>
+
+    </Window.Resources>
+
+    <Grid x:Name="WindowRoot"
+          Margin="18"
+          Background="#01000000"
+          MouseEnter="WindowRoot_MouseEnter"
+          MouseLeave="WindowRoot_MouseLeave">
+        <Grid.ContextMenu>
+            <ContextMenu FontFamily="{StaticResource AppFont}"
+                         Background="#F31A222C"
+                         Foreground="#F2F7FB"
+                         BorderBrush="#42FFFFFF">
+                <MenuItem Header="立即检查更新" Click="RefreshMenuItem_Click" />
+                <MenuItem Header="显示设置" Click="SettingsMenuItem_Click" />
+                <Separator />
+                <MenuItem Header="退出" Click="ExitMenuItem_Click" />
+            </ContextMenu>
+        </Grid.ContextMenu>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Border x:Name="AppFrame"
+                Grid.RowSpan="3"
+                IsHitTestVisible="False"
+                Background="#FF141C24"
+                BorderBrush="#FFE4ECF3"
+                BorderThickness="1"
+                CornerRadius="18"
+                Opacity="0.06" />
+
+        <Grid x:Name="HeaderBar"
+              Grid.Row="0"
+              Height="54"
+              Margin="12,0,8,0">
+            <Grid.Effect>
+                <DropShadowEffect BlurRadius="9"
+                                  ShadowDepth="0"
+                                  Color="#F0000000"
+                                  Opacity="0.88" />
+            </Grid.Effect>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Grid x:Name="HeaderInfoPanel">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="AI HOT"
+                           VerticalAlignment="Center"
+                           FontFamily="{StaticResource AppFont}"
+                           FontSize="17"
+                           FontWeight="SemiBold"
+                           Foreground="#F8FBFD" />
+
+                <Ellipse x:Name="StatusDot"
+                         Grid.Column="1"
+                         Width="6"
+                         Height="6"
+                         Margin="14,1,7,0"
+                         VerticalAlignment="Center"
+                         Fill="#6B7B8D" />
+
+                <StackPanel Grid.Column="2"
+                            Orientation="Horizontal"
+                            VerticalAlignment="Center">
+                    <TextBlock x:Name="StatusText"
+                               Text="检查中"
+                               FontFamily="{StaticResource AppFont}"
+                               FontSize="10.5"
+                               Foreground="#DDD3C6" />
+                    <TextBlock Margin="4,0"
+                               Text="·"
+                               FontSize="10.5"
+                               Foreground="#8D989F" />
+                    <TextBlock x:Name="UpdatedText"
+                               Text="上次刷新：--:--"
+                               FontFamily="{StaticResource AppFont}"
+                               FontSize="10.5"
+                               Foreground="#AAB3BA" />
+                </StackPanel>
+            </Grid>
+
+            <StackPanel Grid.Column="1"
+                        Orientation="Horizontal"
+                        VerticalAlignment="Center">
+                <Button x:Name="SettingsButton"
+                        Style="{StaticResource QuietChromeButtonStyle}"
+                        Content="⚙"
+                        FontFamily="Segoe UI Symbol"
+                        FontSize="14"
+                        ToolTip="显示设置"
+                        Click="SettingsButton_Click" />
+                <Button x:Name="RefreshButton"
+                        Style="{StaticResource QuietChromeButtonStyle}"
+                        Content="↻"
+                        ToolTip="立即检查更新"
+                        Click="RefreshButton_Click" />
+                <Button Style="{StaticResource QuietChromeButtonStyle}"
+                        Content="×"
+                        ToolTip="退出"
+                        Click="CloseButton_Click" />
+            </StackPanel>
+
+            <Popup x:Name="SettingsPopup"
+                   Grid.Column="1"
+                   PlacementTarget="{Binding ElementName=SettingsButton}"
+                   Placement="Bottom"
+                   HorizontalOffset="-246"
+                   VerticalOffset="5"
+                   AllowsTransparency="True"
+                   StaysOpen="False"
+                   Opened="SettingsPopup_Opened"
+                   Closed="SettingsPopup_Closed">
+                <Border Width="286"
+                        Padding="16,15,16,14"
+                        Background="#FB171F28"
+                        BorderBrush="#5FE4ECF3"
+                        BorderThickness="1"
+                        CornerRadius="15">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="22"
+                                          ShadowDepth="8"
+                                          Direction="270"
+                                          Color="#D0000000"
+                                          Opacity="0.72" />
+                    </Border.Effect>
+                    <StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="显示设置"
+                                           FontFamily="{StaticResource AppFont}"
+                                           FontSize="14"
+                                           FontWeight="SemiBold"
+                                           Foreground="#F6FAFC" />
+                                <TextBlock Margin="0,3,0,0"
+                                           Text="外框、页首与新闻卡片分别调整"
+                                           FontFamily="{StaticResource AppFont}"
+                                           FontSize="10.5"
+                                           Foreground="#8493A2" />
+                            </StackPanel>
+                            <Button Grid.Column="1"
+                                    Width="24"
+                                    Height="24"
+                                    Margin="8,-4,-5,0"
+                                    VerticalAlignment="Top"
+                                    Style="{StaticResource ChromeButtonStyle}"
+                                    Content="×"
+                                    FontSize="14"
+                                    ToolTip="关闭设置"
+                                     Click="CloseSettingsButton_Click" />
+                        </Grid>
+
+                        <TextBlock Margin="0,17,0,0"
+                                   Text="页首"
+                                   FontFamily="{StaticResource AppFont}"
+                                   FontSize="10"
+                                   FontWeight="SemiBold"
+                                   Foreground="#C7A15A" />
+                        <Grid Margin="0,7,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="安静时信息强度"
+                                       FontFamily="{StaticResource AppFont}"
+                                       FontSize="11.5"
+                                       Foreground="#C5D0D9" />
+                            <StackPanel Grid.Column="1"
+                                        Orientation="Horizontal">
+                                <TextBlock x:Name="HeaderPreviewText"
+                                           Margin="0,0,9,0"
+                                           Text="AI HOT · 5 条"
+                                           FontFamily="{StaticResource AppFont}"
+                                           FontSize="9.5"
+                                           Foreground="#D9DFE3" />
+                                <TextBlock x:Name="HeaderOpacityText"
+                                           Width="32"
+                                           HorizontalAlignment="Right"
+                                           TextAlignment="Right"
+                                           FontFamily="{StaticResource AppFont}"
+                                           FontSize="11"
+                                           Foreground="#C7A15A" />
+                            </StackPanel>
+                        </Grid>
+                        <Slider x:Name="HeaderOpacitySlider"
+                                Margin="0,5,0,0"
+                                Minimum="35"
+                                AutomationProperties.Name="安静时页首信息强度"
+                                Style="{StaticResource SettingsSliderStyle}"
+                                ValueChanged="OpacitySlider_ValueChanged" />
+
+                        <TextBlock Margin="0,15,0,0"
+                                   Text="外框"
+                                   FontFamily="{StaticResource AppFont}"
+                                   FontSize="10"
+                                   FontWeight="SemiBold"
+                                   Foreground="#C7A15A" />
+                        <Grid Margin="0,7,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="安静时"
+                                       FontFamily="{StaticResource AppFont}"
+                                       FontSize="11.5"
+                                       Foreground="#C5D0D9" />
+                            <StackPanel Grid.Column="1"
+                                        Orientation="Horizontal">
+                                <Border x:Name="QuietPreview"
+                                        Width="20"
+                                        Height="12"
+                                        Margin="0,1,8,0"
+                                        Background="#FF141C24"
+                                        BorderBrush="#FFE4ECF3"
+                                        BorderThickness="1"
+                                        CornerRadius="4" />
+                                <TextBlock x:Name="QuietOpacityText"
+                                           Width="32"
+                                           HorizontalAlignment="Right"
+                                           TextAlignment="Right"
+                                           FontFamily="{StaticResource AppFont}"
+                                           FontSize="11"
+                                           Foreground="#C7A15A" />
+                            </StackPanel>
+                        </Grid>
+                        <Slider x:Name="QuietOpacitySlider"
+                                Margin="0,5,0,0"
+                                AutomationProperties.Name="安静时外框不透明度"
+                                Style="{StaticResource SettingsSliderStyle}"
+                                ValueChanged="OpacitySlider_ValueChanged" />
+
+                        <Grid Margin="0,13,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="鼠标悬停时"
+                                       FontFamily="{StaticResource AppFont}"
+                                       FontSize="11.5"
+                                       Foreground="#C5D0D9" />
+                            <StackPanel Grid.Column="1"
+                                        Orientation="Horizontal">
+                                <Border x:Name="HoverPreview"
+                                        Width="20"
+                                        Height="12"
+                                        Margin="0,1,8,0"
+                                        Background="#FF141C24"
+                                        BorderBrush="#FFE4ECF3"
+                                        BorderThickness="1"
+                                        CornerRadius="4" />
+                                <TextBlock x:Name="HoverOpacityText"
+                                           Width="32"
+                                           HorizontalAlignment="Right"
+                                           TextAlignment="Right"
+                                           FontFamily="{StaticResource AppFont}"
+                                           FontSize="11"
+                                           Foreground="#C7A15A" />
+                            </StackPanel>
+                        </Grid>
+                        <Slider x:Name="HoverOpacitySlider"
+                                Margin="0,5,0,0"
+                                AutomationProperties.Name="鼠标悬停时外框不透明度"
+                                Style="{StaticResource SettingsSliderStyle}"
+                                ValueChanged="OpacitySlider_ValueChanged" />
+
+                        <TextBlock Margin="0,15,0,0"
+                                   Text="新闻卡片"
+                                   FontFamily="{StaticResource AppFont}"
+                                   FontSize="10"
+                                   FontWeight="SemiBold"
+                                   Foreground="#C7A15A" />
+                        <Grid Margin="0,7,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="背景不透明度"
+                                       FontFamily="{StaticResource AppFont}"
+                                       FontSize="11.5"
+                                       Foreground="#C5D0D9" />
+                            <StackPanel Grid.Column="1"
+                                        Orientation="Horizontal">
+                                <Border x:Name="CardPreview"
+                                        Width="28"
+                                        Height="15"
+                                        Margin="0,0,8,0"
+                                        BorderThickness="1"
+                                        CornerRadius="5">
+                                    <TextBlock Text="Aa"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"
+                                               FontFamily="{StaticResource AppFont}"
+                                               FontSize="7"
+                                               Foreground="#F4F7F9" />
+                                </Border>
+                                <TextBlock x:Name="CardOpacityText"
+                                           Width="32"
+                                           HorizontalAlignment="Right"
+                                           TextAlignment="Right"
+                                           FontFamily="{StaticResource AppFont}"
+                                           FontSize="11"
+                                           Foreground="#C7A15A" />
+                            </StackPanel>
+                        </Grid>
+                        <Slider x:Name="CardOpacitySlider"
+                                Margin="0,5,0,0"
+                                Minimum="55"
+                                AutomationProperties.Name="新闻卡片背景不透明度"
+                                Style="{StaticResource SettingsSliderStyle}"
+                                ValueChanged="OpacitySlider_ValueChanged" />
+
+                        <TextBlock Margin="0,10,0,6"
+                                   Text="卡片色调"
+                                   FontFamily="{StaticResource AppFont}"
+                                   FontSize="11"
+                                   Foreground="#AEB9C2" />
+                        <StackPanel Orientation="Horizontal">
+                            <Button x:Name="CharcoalToneButton"
+                                    Style="{StaticResource ToneButtonStyle}"
+                                    Tag="charcoal"
+                                    Background="#FF3A4652"
+                                    AutomationProperties.Name="墨色卡片"
+                                    ToolTip="墨色"
+                                    Click="CardToneButton_Click" />
+                            <Button x:Name="WarmToneButton"
+                                    Style="{StaticResource ToneButtonStyle}"
+                                    Tag="warm"
+                                    Background="#FF6A4A3A"
+                                    AutomationProperties.Name="暖褐卡片"
+                                    ToolTip="暖褐"
+                                    Click="CardToneButton_Click" />
+                            <Button x:Name="PlumToneButton"
+                                    Style="{StaticResource ToneButtonStyle}"
+                                    Tag="plum"
+                                    Background="#FF59415F"
+                                    AutomationProperties.Name="深紫卡片"
+                                    ToolTip="深紫"
+                                    Click="CardToneButton_Click" />
+                            <Button x:Name="ForestToneButton"
+                                    Style="{StaticResource ToneButtonStyle}"
+                                    Tag="forest"
+                                    Background="#FF385649"
+                                    AutomationProperties.Name="深绿卡片"
+                                    ToolTip="深绿"
+                                    Click="CardToneButton_Click" />
+                        </StackPanel>
+
+                        <Grid Margin="0,15,0,0">
+                            <TextBlock VerticalAlignment="Center"
+                                       Text="修改会即时预览并自动保存"
+                                       FontFamily="{StaticResource AppFont}"
+                                       FontSize="9.5"
+                                       Foreground="#6F7F8D" />
+                            <Button HorizontalAlignment="Right"
+                                    Padding="9,4"
+                                    Background="#1FFFFFFF"
+                                    BorderBrush="#32FFFFFF"
+                                    BorderThickness="1"
+                                    Foreground="#AEBBC6"
+                                    FontFamily="{StaticResource AppFont}"
+                                    FontSize="10"
+                                    Cursor="Hand"
+                                    Content="恢复默认"
+                                    Click="ResetAppearanceButton_Click" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </Popup>
+        </Grid>
+
+        <Grid Grid.Row="1"
+              Margin="0,0,0,0">
+            <ScrollViewer x:Name="NewsViewport"
+                          HorizontalScrollBarVisibility="Disabled"
+                          VerticalScrollBarVisibility="Auto"
+                          CanContentScroll="True">
+                <ScrollViewer.Resources>
+                    <Style TargetType="ScrollBar"
+                           BasedOn="{StaticResource SlimScrollBarStyle}" />
+                </ScrollViewer.Resources>
+                <StackPanel>
+                    <StackPanel x:Name="HotSection">
+                        <Border Margin="0,2,0,8"
+                                Padding="14,7"
+                                Background="#A0182029"
+                                BorderBrush="#4FD87870"
+                                BorderThickness="1"
+                                CornerRadius="10">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Border Width="3"
+                                        Height="14"
+                                        Margin="0,0,8,0"
+                                        VerticalAlignment="Center"
+                                        Background="#D87870"
+                                        CornerRadius="2" />
+                                <TextBlock Grid.Column="1"
+                                           Text="当前热点"
+                                           VerticalAlignment="Center"
+                                           FontFamily="{StaticResource AppFont}"
+                                           FontSize="12"
+                                           FontWeight="SemiBold"
+                                           Foreground="#E8CBC8" />
+                                <TextBlock x:Name="HotCountText"
+                                           Grid.Column="2"
+                                           VerticalAlignment="Center"
+                                           Style="{StaticResource QuietHeaderMetadataTextStyle}"
+                                           FontFamily="{StaticResource AppFont}"
+                                           FontSize="10"
+                                           Foreground="#8E9AA5" />
+                            </Grid>
+                        </Border>
+                        <ItemsControl x:Name="HotNewsList"
+                                      ItemTemplate="{StaticResource NewsCardTemplate}" />
+                    </StackPanel>
+
+                    <StackPanel x:Name="TodaySection"
+                                Margin="0,6,0,0">
+                        <Border Margin="0,2,0,8"
+                                Padding="14,7"
+                                Background="#A0182029"
+                                BorderBrush="#4FC7A15A"
+                                BorderThickness="1"
+                                CornerRadius="10">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Border Width="3"
+                                        Height="14"
+                                        Margin="0,0,8,0"
+                                        VerticalAlignment="Center"
+                                        Background="#C7A15A"
+                                        CornerRadius="2" />
+                                <TextBlock Grid.Column="1"
+                                           Text="今日新讯"
+                                           VerticalAlignment="Center"
+                                           FontFamily="{StaticResource AppFont}"
+                                           FontSize="12"
+                                           FontWeight="SemiBold"
+                                           Foreground="#E4D2AE" />
+                                <TextBlock x:Name="TodayCountText"
+                                           Grid.Column="2"
+                                           VerticalAlignment="Center"
+                                           Style="{StaticResource QuietHeaderMetadataTextStyle}"
+                                           FontFamily="{StaticResource AppFont}"
+                                           FontSize="10"
+                                           Foreground="#8E9AA5" />
+                            </Grid>
+                        </Border>
+                        <ItemsControl x:Name="TodayNewsList"
+                                      ItemTemplate="{StaticResource NewsCardTemplate}" />
+                    </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
+
+            <Border x:Name="EmptyState"
+                    MinHeight="88"
+                    Padding="18"
+                    Visibility="Collapsed"
+                    Background="#F4182029"
+                    BorderBrush="#32FFFFFF"
+                    BorderThickness="1"
+                    CornerRadius="14">
+                <StackPanel HorizontalAlignment="Center"
+                            VerticalAlignment="Center">
+                    <TextBlock x:Name="EmptyStateTitle"
+                               Text="当前没有明显热点"
+                               HorizontalAlignment="Center"
+                               FontFamily="{StaticResource AppFont}"
+                               FontSize="13"
+                               FontWeight="SemiBold"
+                               Foreground="#D8E1E9" />
+                    <TextBlock x:Name="EmptyStateText"
+                               Margin="0,5,0,0"
+                               Text="AI HOT 暂未形成多源热点"
+                               Style="{StaticResource QuietMetadataTextStyle}"
+                               HorizontalAlignment="Center"
+                               FontFamily="{StaticResource AppFont}"
+                               FontSize="11"
+                               Foreground="#8C9AA8" />
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <Grid x:Name="FooterBar"
+              Grid.Row="2"
+              Height="28"
+              Margin="10,0">
+            <Grid.Effect>
+                <DropShadowEffect BlurRadius="7"
+                                  ShadowDepth="0"
+                                  Color="#E0000000"
+                                  Opacity="0.72" />
+            </Grid.Effect>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="每 15 分钟自动检查"
+                       VerticalAlignment="Center"
+                       Style="{StaticResource QuietMetadataTextStyle}"
+                       FontFamily="{StaticResource AppFont}"
+                       FontSize="9.5"
+                       Foreground="#80909D" />
+            <TextBlock Grid.Column="1"
+                       Text="DATA BY AI HOT"
+                       VerticalAlignment="Center"
+                       Style="{StaticResource QuietMetadataTextStyle}"
+                       FontFamily="{StaticResource AppFont}"
+                       FontSize="9.5"
+                       FontWeight="SemiBold"
+                       Foreground="#7A928B" />
+        </Grid>
+    </Grid>
+</Window>

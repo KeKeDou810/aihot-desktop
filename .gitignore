@@ -1,0 +1,16 @@
+bin/
+obj/
+.vs/
+.idea/
+*.user
+*.suo
+*.cache
+*.log
+*.pdb
+publish/
+artifacts/
+screenshots/*.png
+TestResults/
+coverage/
+.DS_Store
+Thumbs.db
