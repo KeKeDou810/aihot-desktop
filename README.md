@@ -11,6 +11,13 @@
 窗口会根据新闻数量调整高度，支持拖动、位置记忆、透明度和卡片颜色设置。
 点击新闻会在浏览器中打开 AI HOT 原文页面。
 
+## 下载
+
+[下载 AIHotDesktop.exe](https://github.com/KeKeDou810/aihot-desktop/releases/latest/download/AIHotDesktop.exe)
+
+这是一个免安装的 Windows x64 单文件程序。下载到桌面或任意固定位置后，
+双击即可运行，不需要管理员权限或预装 .NET。
+
 ## 刷新
 
 - 启动时请求一次；
@@ -20,7 +27,7 @@
 
 当前没有服务端事件订阅，因此应用不是秒级实时更新。
 
-## 运行
+## 从源码运行
 
 需要 Windows 10/11 和 [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)。
 
@@ -30,18 +37,23 @@ cd aihot-desktop
 dotnet run --project .\AIHotDesktop.csproj
 ```
 
-生成 Windows x64 单文件：
+生成同款 Windows x64 便携版：
 
 ```powershell
 dotnet publish .\AIHotDesktop.csproj `
   -c Release `
   -r win-x64 `
-  --self-contained false `
+  --self-contained true `
   -p:PublishSingleFile=true `
-  -o .\artifacts\win-x64
+  -p:IncludeNativeLibrariesForSelfExtract=true `
+  -p:EnableCompressionInSingleFile=true `
+  -p:DebugType=None `
+  -p:DebugSymbols=false `
+  -o .\artifacts\portable
 ```
 
-生成的程序仍需要 .NET 8 Desktop Runtime。
+生成结果为 `artifacts\portable\AIHotDesktop.exe`。当前程序尚未代码签名，
+Windows 可能显示“未知发布者”提示。
 
 ## 数据与隐私
 
