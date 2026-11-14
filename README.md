@@ -1,7 +1,7 @@
 # AI HOT Desktop
 
 一个安静悬浮在 Windows 桌面上的 AI 新闻小工具，内容来自
-[AI HOT](https://aihot.virxact.com)。
+[AI HOT](https://aihot.news)。
 
 它把信息分成两组：
 

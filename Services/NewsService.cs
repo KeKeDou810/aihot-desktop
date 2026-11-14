@@ -11,9 +11,9 @@ namespace AIHotDesktop.Services;
 public sealed class NewsService
 {
     private const string HotTopicsUrl =
-        "https://aihot.virxact.com/api/v1/hot-topics";
+        "https://aihot.news/api/v1/hot-topics";
     private const string TodayItemsUrl =
-        "https://aihot.virxact.com/api/v1/items?mode=selected&window=24h&by=timeline&limit=100";
+        "https://aihot.news/api/v1/items?mode=selected&window=24h&by=timeline&limit=100";
 
     private static readonly TimeZoneInfo ChinaTimeZone =
         TimeZoneInfo.FindSystemTimeZoneById("China Standard Time");

@@ -400,7 +400,7 @@ public partial class MainWindow : Window
                         ? "多个信源交叉关注"
                         : "今日精选内容摘要",
                     Source = "AI HOT QA",
-                    Link = "https://aihot.virxact.com",
+                    Link = "https://aihot.news",
                     Category = category,
                     Timestamp = DateTimeOffset.Now
                 }
@@ -547,7 +547,7 @@ public partial class MainWindow : Window
             || !Uri.TryCreate(item.Link, UriKind.Absolute, out var uri)
             || uri.Scheme != Uri.UriSchemeHttps
             || !uri.Host.Equals(
-                "aihot.virxact.com",
+                "aihot.news",
                 StringComparison.OrdinalIgnoreCase))
         {
             return;
