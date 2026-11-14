@@ -400,7 +400,7 @@ public partial class MainWindow : Window
                         ? "多个信源交叉关注"
                         : "今日精选内容摘要",
                     Source = "AI HOT QA",
-                    Link = "https://aihot.virxact.com",
+                    Link = "https://aihot.news",
                     Category = category,
                     Timestamp = DateTimeOffset.Now
                 }
@@ -545,10 +545,17 @@ public partial class MainWindow : Window
     {
         if (sender is not Button { DataContext: NewsCardItem item }
             || !Uri.TryCreate(item.Link, UriKind.Absolute, out var uri)
-            || uri.Scheme != Uri.UriSchemeHttps
-            || !uri.Host.Equals(
-                "aihot.virxact.com",
-                StringComparison.OrdinalIgnoreCase))
+            || uri.Scheme != Uri.UriSchemeHttps)
+        {
+            return;
+        }
+
+        if (uri.Host.Equals("aihot.virxact.com", StringComparison.OrdinalIgnoreCase))
+        {
+            uri = new UriBuilder(uri) { Host = "aihot.news" }.Uri;
+        }
+
+        if (!uri.Host.Equals("aihot.news", StringComparison.OrdinalIgnoreCase))
         {
             return;
         }
