@@ -545,10 +545,17 @@ public partial class MainWindow : Window
     {
         if (sender is not Button { DataContext: NewsCardItem item }
             || !Uri.TryCreate(item.Link, UriKind.Absolute, out var uri)
-            || uri.Scheme != Uri.UriSchemeHttps
-            || !uri.Host.Equals(
-                "aihot.news",
-                StringComparison.OrdinalIgnoreCase))
+            || uri.Scheme != Uri.UriSchemeHttps)
+        {
+            return;
+        }
+
+        if (uri.Host.Equals("aihot.virxact.com", StringComparison.OrdinalIgnoreCase))
+        {
+            uri = new UriBuilder(uri) { Host = "aihot.news" }.Uri;
+        }
+
+        if (!uri.Host.Equals("aihot.news", StringComparison.OrdinalIgnoreCase))
         {
             return;
         }
